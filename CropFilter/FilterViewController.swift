@@ -23,6 +23,8 @@ class FilterViewController: UIViewController {
     var shapeLayer = CAShapeLayer()
     var croppedImage = UIImage()
     
+    var imageView: UIImageView!
+    
     init(image: UIImage, path: UIBezierPath) {
         super.init(nibName: nil, bundle: nil)
         self.image = image
@@ -37,22 +39,21 @@ class FilterViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSubView()
-       
-        filterView.imageView.image = self.image
+        view.backgroundColor = .orange
+        imageView = UIImageView()
+        imageView.frame = CGRect(x: 0, y: 0, width: 200, height: 200)
+        imageView.center = view.center
+        imageView.contentMode = .scaleAspectFill
+        imageView.image = image
+        view.addSubview(imageView)
         applyFilter()
+        cropAgain()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
     }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        filterView.imageView.frame = CGRect(x: 0, y: 100, width: 100, height: 100)
-        cropAgain()
-    }
-    
+
     private func setupSubView() {
         view.addSubview(filterView)
         filterView.snp.makeConstraints { (make) in
@@ -63,7 +64,7 @@ class FilterViewController: UIViewController {
         
     }
     private func applyFilter() {
-        let myImage = filterView.imageView.image!
+        let myImage = imageView.image!
         let aCGImage = myImage.cgImage
         aCIImage = CIImage(cgImage: aCGImage!)
         context = CIContext(options: nil)
@@ -73,27 +74,21 @@ class FilterViewController: UIViewController {
         outputImage = spotColorFilter.outputImage!
         let cgimg = context.createCGImage(outputImage, from: outputImage.extent)
         image = UIImage(cgImage: cgimg!)
-        filterView.imageView.image = newUIImage
-        
+        imageView.image = image
     }
     
     private func cropAgain() {
-        //shapeLayer.fillColor = UIColor.black.cgColor
         shapeLayer.path = path.cgPath
         shapeLayer.fillColor = UIColor.clear.cgColor
-        filterView.imageView.layer.addSublayer(shapeLayer)
-        filterView.imageView.layer.mask = shapeLayer
-    UIGraphicsBeginImageContextWithOptions(filterView.imageView.bounds.size, false, 1)
+        imageView.layer.addSublayer(shapeLayer)
+        imageView.layer.mask = shapeLayer
         
-        filterView.imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
-        
+        UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, false, 1)
+        imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        
         UIGraphicsEndImageContext()
         
-        self.image = newImage!
-        filterView.imageView.backgroundColor = .orange
-        self.filterView.imageView.image = image
+        imageView.image = newImage!
     }
     
     private func setupNavBar() {
