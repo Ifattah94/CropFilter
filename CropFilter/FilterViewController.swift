@@ -19,10 +19,14 @@ class FilterViewController: UIViewController {
     var context = CIContext()
     var outputImage = CIImage()
     var newUIImage = UIImage()
+    var path: UIBezierPath!
+    var shapeLayer = CAShapeLayer()
+    var croppedImage = UIImage()
     
-    init(image: UIImage) {
+    init(image: UIImage, path: UIBezierPath) {
         super.init(nibName: nil, bundle: nil)
         self.image = image
+        self.path = path
         
     }
     
@@ -37,8 +41,15 @@ class FilterViewController: UIViewController {
        
         filterView.imageView.image = self.image
         applyFilter()
+        //cropAgain()
 
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        cropAgain()
+    }
+    
     private func setupSubView() {
         view.addSubview(filterView)
         filterView.snp.makeConstraints { (make) in
@@ -58,9 +69,40 @@ class FilterViewController: UIViewController {
         spotColorFilter.setValuesForKeys(["inputCenterColor1": CIColor(color: .red), "inputCenterColor2" : CIColor(color: .clear), "inputCenterColor3": CIColor(color: .black), "inputReplacementColor1": CIColor(color: .black), "inputReplacementColor2": CIColor(color: .clear), "inputReplacementColor3": CIColor(color: .black)])
         outputImage = spotColorFilter.outputImage!
         let cgimg = context.createCGImage(outputImage, from: outputImage.extent)
-        newUIImage = UIImage(cgImage: cgimg!)
+        image = UIImage(cgImage: cgimg!)
         filterView.imageView.image = newUIImage
+        
     }
+    
+    private func cropAgain() {
+        //shapeLayer.fillColor = UIColor.black.cgColor
+        shapeLayer.path = path.cgPath
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        filterView.imageView.layer.addSublayer(shapeLayer)
+        filterView.imageView.layer.mask = shapeLayer
+        UIGraphicsBeginImageContextWithOptions(filterView.imageView.bounds.size, false, 1)
+        
+        filterView.imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
+        
+//        if let context = UIGraphicsGetCurrentContext() {
+//            filterView.imageView.layer.render(in: context)
+//        } else {
+//            UIGraphicsBeginImageContext(view.bounds.size)
+//            filterView.imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
+//
+//            print("context is nil")
+//        }
+    
+//         filterView.imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        self.croppedImage = newImage!
+        self.filterView.imageView.image = croppedImage
+    }
+    
     private func setupNavBar() {
         
     }

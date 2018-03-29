@@ -66,10 +66,9 @@ class CropViewController: UIViewController {
     }
     
     @objc func presentFilterVC() {
-        cropImage()
-        let vc = FilterViewController(image: croppedImage)
-        navigationController?.pushViewController(vc, animated: false)
         //cropImage()
+        let vc = FilterViewController(image: image, path: path)
+        navigationController?.pushViewController(vc, animated: false)
 
     }
     

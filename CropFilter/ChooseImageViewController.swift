@@ -22,7 +22,6 @@ class ChooseImageViewController: UIViewController {
         imagePickerController.delegate = self
         setupSubView()
         chooseImageView.imageView.addGestureRecognizer(tapRecognizer)
-
     }
     
     private func setupSubView() {
