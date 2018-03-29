@@ -39,6 +39,8 @@ class CropViewController: UIViewController {
         cropView.imageView.image = self.image
         croppedImage = self.image
         addActions()
+        
+        
        
     }
     

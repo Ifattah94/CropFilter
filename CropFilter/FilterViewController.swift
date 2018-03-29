@@ -41,12 +41,15 @@ class FilterViewController: UIViewController {
        
         filterView.imageView.image = self.image
         applyFilter()
-        //cropAgain()
-
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        filterView.imageView.frame = CGRect(x: 0, y: 100, width: 100, height: 100)
         cropAgain()
     }
     
@@ -80,27 +83,17 @@ class FilterViewController: UIViewController {
         shapeLayer.fillColor = UIColor.clear.cgColor
         filterView.imageView.layer.addSublayer(shapeLayer)
         filterView.imageView.layer.mask = shapeLayer
-        UIGraphicsBeginImageContextWithOptions(filterView.imageView.bounds.size, false, 1)
+    UIGraphicsBeginImageContextWithOptions(filterView.imageView.bounds.size, false, 1)
         
         filterView.imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
-        
-//        if let context = UIGraphicsGetCurrentContext() {
-//            filterView.imageView.layer.render(in: context)
-//        } else {
-//            UIGraphicsBeginImageContext(view.bounds.size)
-//            filterView.imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
-//
-//            print("context is nil")
-//        }
-    
-//         filterView.imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
         
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         
         UIGraphicsEndImageContext()
         
-        self.croppedImage = newImage!
-        self.filterView.imageView.image = croppedImage
+        self.image = newImage!
+        filterView.imageView.backgroundColor = .orange
+        self.filterView.imageView.image = image
     }
     
     private func setupNavBar() {
